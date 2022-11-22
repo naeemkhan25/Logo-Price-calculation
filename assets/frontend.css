@@ -1,0 +1,48 @@
+.extra_calculation_button_wrap{
+    margin-bottom: 50px;
+}
+/* .lpc_variations{
+    border-bottom: 1px solid var(--ast-border-color);
+    position: relative;
+    margin-bottom: 1em;
+    width: 100%;
+} */
+
+.lpc_variations{
+    margin-top: 20px;
+}
+
+.lpc_border-none {
+    border-collapse: collapse;
+    border: none;
+    margin-top: 10px;
+  }
+  .lpc_border-none th {
+    border-top:none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 2px solid #ddd;
+  }
+  .lpc_border-none td {
+    border: none;
+  }
+  
+  .lpc_border-none tr:first-child td {
+    border-top: none;
+  }
+  
+  .lpc_border-none tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .lpc_border-none tr td:first-child {
+    border-left: none;
+  }
+  
+  .lpc_border-none tr td:last-child {
+    border-right: none;
+  }
+
+  .lpc_hide_extra_product_class {
+    display: block;
+  }
