@@ -46,3 +46,34 @@
   .lpc_hide_extra_product_class {
     display: block;
   }
+
+  #lpc_quontity_size_total, #lpc_quontity_size_total td{
+    text-align: center;
+    border: none;
+  }
+
+  #lpc_quontity_size_total input{
+   width: 60px;
+   border: none;
+   background-color: #fff;
+   box-shadow: 0 0 15px 10px rgba(0,0,0,.06);
+   text-align: center;
+   border-radius: 4px;
+  }
+  button.lpc_calculate_price_button.button {
+    margin-bottom: 20px;
+}
+.lpc_product_price_calculating_table td {
+  text-align: center;
+}
+table#lpc_percentance_table_total {
+  border: 1px solid darkgray;
+  text-align: center;
+
+}
+table#lpc_percentance_table_total th {
+ background-color: beige;
+}
+.lpc_product_price_calculating_table {
+  margin-bottom: 40px;
+}

@@ -3,7 +3,7 @@
  * Plugin Name: Product Logo Price Calulation
  * Plugin URI: 
  * Description: Calculation logo price
- * Version: 1.0.0
+ * Version: 1.0.6
  * Author: Pilar
  * Author URI: 
  * Text Domain: logo-price-calculation
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 // define constants.
 if ( ! defined( 'LPC_VERSION' ) ) {
-	define( 'LPC_VERSION', '1.0.0' );
+	define( 'LPC_VERSION', '1.0.6' );
 	define( 'LPC_PATH', plugin_dir_path( __FILE__ ) );
 	define( 'LPC_INCLUDES', LPC_PATH . 'includes' );
 	define( 'LPC_URL', plugin_dir_url( __FILE__ ) );
