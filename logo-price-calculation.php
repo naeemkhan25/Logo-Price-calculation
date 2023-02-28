@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name: Product Logo Price Calulation
+ * Plugin Name: Product Logo Price Calculation
  * Plugin URI: 
  * Description: Calculation logo price
- * Version: 1.0.6
+ * Version: 1.0.0
  * Author: Pilar
  * Author URI: 
  * Text Domain: logo-price-calculation
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 // define constants.
 if ( ! defined( 'LPC_VERSION' ) ) {
-	define( 'LPC_VERSION', '1.0.6' );
+	define( 'LPC_VERSION', '1.0.0' );
 	define( 'LPC_PATH', plugin_dir_path( __FILE__ ) );
 	define( 'LPC_INCLUDES', LPC_PATH . 'includes' );
 	define( 'LPC_URL', plugin_dir_url( __FILE__ ) );
@@ -36,6 +36,26 @@ register_activation_hook( LPC_FILE, 'lpc_active' );
  */
 function lpc_active() {
 	lpc_insert_default_data();
+	low_price_create_tables();
+}
+/**
+ * Use for create datebase table
+ *
+ * @return void
+ *
+ * @version 1.0.0
+ */
+function low_price_create_tables() {
+	global $wpdb;
+	$wpdb->hide_errors();
+	$table_name = $wpdb->prefix . 'low_price';
+	$sql = "CREATE TABLE if not exists $table_name(
+	id INT(11) NOT NULL AUTO_INCREMENT, product_id VARCHAR(1000), price VARCHAR(255),
+	create_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY(id)
+	)";
+	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+	dbDelta( $sql );
 }
 /**
  * Update plugin default data

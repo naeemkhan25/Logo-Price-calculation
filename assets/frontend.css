@@ -22,6 +22,7 @@
     border-left: none;
     border-right: none;
     border-bottom: 2px solid #ddd;
+    text-transform: capitalize;
   }
   .lpc_border-none td {
     border: none;
@@ -77,3 +78,44 @@ table#lpc_percentance_table_total th {
 .lpc_product_price_calculating_table {
   margin-bottom: 40px;
 }
+
+@media only screen and (max-width: 553px) {
+  .lpc_product_price_calculating_table {
+    margin-bottom: 0px;
+    font-size: 12px;
+  }
+  #lpc_quontity_size_total, #lpc_quontity_size_total td {
+    text-align: center;
+    border: none;
+    display: inline-block;
+    margin-left: -6px !important;
+  } 
+}
+@media only screen and (max-width: 443px) {
+  .lpc_product_price_calculating_table {
+    margin-bottom: 0px;
+    display: inline-block;
+    margin-left: -37px;
+  }
+  .lpc_border-none{
+    position: relative;
+    margin-left: 51px;
+  }
+  .lpc_border-none tbody, td, tfoot, th, thead, tr {
+    display: block;
+  }
+  tr.class_th_right {
+    /* display: inline-block; */
+    position: absolute;
+    top: 0px;
+    left: 189px;
+  }
+
+}
+/* @media only screen and (max-width: 404px) {
+  .lpc_product_price_calculating_table {
+    margin-bottom: 0px;
+    display: inline-block;
+    margin-left: -43px;
+  }
+} */

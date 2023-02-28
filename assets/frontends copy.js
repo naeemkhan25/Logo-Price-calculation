@@ -10,38 +10,16 @@
             $(element).on('change',function(){
                 lpc_local.removeItem('lpc_logo_price1');
                 lpc_local.removeItem('lpc_logo_price2');
-                lpc_local.removeItem('lpc_additional_price1');
-                lpc_local.removeItem('lpc_additional_price2');
-                lpc_local.removeItem('lpc_total_additional');
             });
         });
     });
-     $(document).on('change','[name="quantity"]', function(e) {
-            var $thisbuttons = $(this),
-            $form = $thisbuttons.closest('form.cart'),
-            product_qty = $form.find('input[name=quantity]').val() || 1;
-            products__price  = $('.lpc_product_price').val() || 0;
-            var logo_price1 = lpc_local.getItem('lpc_logo_price1');
-            var logo_price2 = lpc_local.getItem('lpc_logo_price2');
-            lpc_local.setItem('lpc_product_quontity',product_qty);
-            lpc_price_calculation(product_qty,products__price,logo_price1,logo_price2);
-    });
-    $(document).on('keyup','[name="quantity"]', function(e) { 
-        var $thisbuttons = $(this),
-        $form = $thisbuttons.closest('form.cart'),
-        product_qty = $form.find('input[name=quantity]').val() || 1;
-        products__price  = $('.lpc_product_price').val() || 0;
-        var logo_price1 = lpc_local.getItem('lpc_logo_price1');
-        var logo_price2 = lpc_local.getItem('lpc_logo_price2');
-        lpc_local.setItem('lpc_product_quontity',product_qty);
-        lpc_price_calculation(product_qty,products__price,logo_price1,logo_price2);
-    });
-    
     $(document).on('click','.lpc_calculate_price_button', function(e) {
         e.preventDefault();
-        let self2 = $(this).parents('.extra_calculation_button_wrap');
+        let self = $(this).parents('.extra_calculation_button_wrap');
         self.find('.lpc_select_option').css("display",'none');
         self.find('.lpc_select_option').css("display",'block');
+        // self.find('.lpc_logo_main_select').val('none');
+        // self.find('.lpc_logo_main_select2').val('none');
         var quantity_value1 = self.find('.lpc_size_xs').val();
         var quantity_value2 = self.find('.lpc_size_s').val();
         var quantity_value3 = self.find('.lpc_size_m').val();
@@ -49,11 +27,34 @@
         var quantity_value5 = self.find('.lpc_size_xl').val();
         var quantity_value6 = self.find('.lpc_size_2xl').val();
         var quantity_value7 = self.find('.lpc_size_3xl').val();
-        var product_qty     =  lpc_local.getItem('lpc_product_quontity');
-        quantity_calculation(quantity_value1,quantity_value2,quantity_value3,quantity_value4,quantity_value5,quantity_value6,quantity_value7,product_qty);
+
+        // lpc_local.removeItem('lpc_logo_price1');
+        // lpc_local.removeItem('lpc_logo_price2');
+        quantity_calculation(quantity_value1,quantity_value2,quantity_value3,quantity_value4,quantity_value5,quantity_value6,quantity_value7);
     });
-   
-   
+
+    // $(document).ready(function(){
+    //     var extra_rand_vals = document.querySelectorAll(
+    //         "#lpc_quontity_size_total"
+    //       );
+    //       var all_input_fileds = $(extra_rand_vals).find('input');
+    //         var quontity_total = 0;
+    //       all_input_fileds.each((index,e)=>{
+    //         var values = $(e).val();
+    //             quontity_total = quontity_total+ parseInt(values);
+    //       });
+
+    //       if ( quontity_total <= 0 ) {
+    //         quontity_total = 1;
+    //       }  
+    //       var logo_price1 = lpc_local.getItem('lpc_logo_price2');
+    //       var logo_price2 = lpc_local.getItem('lpc_logo_price1');
+    //       var products__price  = $('.lpc_product_price').val() || 0;
+    //     //   var product_qty = $('form.cart').find('input[name=quantity]').val() || 1;
+         
+    //       lpc_price_calculation(quontity_total,products__price,logo_price1,logo_price2);
+    // });
+
     $(document).on('keyup','.lpc_size_xs',function(){
         var $this = $(this).val();
         if ($this < 0 ) {
@@ -69,9 +70,6 @@
         var quantity_value7 = lpc_local.getItem('tc_select_size_3xl');
         quantity_calculation($this,quantity_value2,quantity_value3,quantity_value4,quantity_value5,quantity_value6,quantity_value7);
     });
-
-
-
     $(document).on('keyup','.lpc_size_s',function(){
         var $this = $(this).val();
         if ($this < 0 ) {
@@ -101,6 +99,7 @@
         var quantity_value5 = lpc_local.getItem('tc_select_size_xl');
         var quantity_value6 = lpc_local.getItem('tc_select_size_2xl');
         var quantity_value7 = lpc_local.getItem('tc_select_size_3xl');
+        // var product_qty = lpc_local.getItem('lpc_product_quontity');
         quantity_calculation(quantity_value1,quantity_value2,$this,quantity_value4,quantity_value5,quantity_value6,quantity_value7);
         
 
@@ -120,6 +119,7 @@
         var quantity_value5 = lpc_local.getItem('tc_select_size_xl');
         var quantity_value6 = lpc_local.getItem('tc_select_size_2xl');
         var quantity_value7 = lpc_local.getItem('tc_select_size_3xl');
+        // var product_qty = lpc_local.getItem('lpc_product_quontity');
         quantity_calculation(quantity_value1,quantity_value2,quantity_value3,$this,quantity_value5,quantity_value6,quantity_value7);
 
     });
@@ -129,6 +129,7 @@
           $this = 0;
             $(this).val(0);
         }
+
         lpc_local.setItem('tc_select_size_xl',$this);
         var quantity_value1 = lpc_local.getItem('tc_select_size_xs');
         var quantity_value2 = lpc_local.getItem('tc_select_size_s');
@@ -172,7 +173,7 @@
 
     });
 
-    function quantity_calculation(quantity_value1,quantity_value2,quantity_value3,quantity_value4,quantity_value5,quantity_value6,quantity_value7,product_qty = 0 ) {
+    function quantity_calculation(quantity_value1,quantity_value2,quantity_value3,quantity_value4,quantity_value5,quantity_value6,quantity_value7 ) {
         if (quantity_value1 == null || quantity_value1 == '' ) {
             quantity_value1 = 0;
         }
@@ -197,10 +198,7 @@
         }
 
         var quontity_total = parseInt(quantity_value1) + parseInt(quantity_value2) + parseInt(quantity_value3) + parseInt(quantity_value4) + parseInt(quantity_value5) + parseInt(quantity_value6) + parseInt(quantity_value7);
-        if ( quontity_total == 0 ) {
-            quontity_total = parseInt(quontity_total) + parseInt(product_qty);
-        }
-        if ( quontity_total == 0 ) {
+        if ( quontity_total <= 0 ) {
             quontity_total = 1;
         }
         var logo_price1 = lpc_local.getItem('lpc_logo_price2');
@@ -212,7 +210,6 @@
 
     $(document).on('change','.lpc_logo_main_select', function(e) {
         var select_value = this.value;
-        // console.log(select_value);
         if ( select_value == 'none' ) {
             select_value = 'lpc_logo1_parents-none';
         }
@@ -229,7 +226,6 @@
                 if ( replace_value[1] == 'none' ) {
                     $(element).parent().css('display','none');
                     lpc_local.removeItem('lpc_logo_price1');
-                    lpc_local.removeItem('lpc_additional_price1');
                     var elementParents   = $(element).parents().find('form.cart');
                     // var product_qty = $(elementParents).find('input[name=quantity]').val();
                     var pproduct_qtys = lpc_local.getItem('lpc_total_quontity') || 1;
@@ -240,10 +236,6 @@
                 } else {
                     if ( classAttr == select_value) {
                         var logo_price_1 = $(element).val();
-                        // var attr_value = $(element).attr('data-value');
-                        var option = $('option:selected', element).attr('data-value');
-                        lpc_local.setItem('lpc_additional_price1',option);
-                        // console.log(element);
                         //call
                         lpc_local.setItem('lpc_logo_price1',logo_price_1);
                         var elementParents   = $(element).parents().find('form.cart');
@@ -254,8 +246,6 @@
                         lpc_price_calculation(pproduct_qtys,products__price,logo_price_1,Snd_local_storage );
                         $(element).on('change',function() {
                             var current_value = this.value;
-                            var option1 = $('option:selected', this).attr('data-value');
-                            lpc_local.setItem('lpc_additional_price1',option1);
                             //call
                             lpc_local.setItem('lpc_logo_price1',current_value);
                             var elementParents   = $(element).parents().find('form.cart');
@@ -279,7 +269,6 @@
 
     $(document).on('change','.lpc_logo_main_select2', function(e) {
         var select_value = this.value;
-      
         if ( select_value == 'none' ) {
             select_value = 'lpc_logo2_parents-none';
         }
@@ -296,7 +285,6 @@
                 if ( replace_value[1] == 'none' ) {
                     $(element).parent().css('display','none');
                     lpc_local.removeItem('lpc_logo_price2');
-                    lpc_local.removeItem('lpc_additional_price2');
                     var elementParents   = $(element).parents().find('form.cart');
                     // var product_qty = $(elementParents).find('input[name=quantity]').val();
                     var pproduct_qtys = lpc_local.getItem('lpc_total_quontity') || 1;
@@ -307,11 +295,8 @@
                 } else {
                     if ( classAttr == select_value) {
                         var logo_price_1 = $(element).val();
-                        var option = $('option:selected', element).attr('data-value');
-                        lpc_local.setItem('lpc_additional_price2',option);
                         var elementParents   = $(element).parents().find('form.cart');
                         // var product_qty = $(elementParents).find('input[name=quantity]').val();
-
                         var pproduct_qtys = lpc_local.getItem('lpc_total_quontity') || 1;
                         //call
                         lpc_local.setItem('lpc_logo_price2',logo_price_1);
@@ -320,8 +305,6 @@
                         lpc_price_calculation(pproduct_qtys,products__price,first_local_storage,logo_price_1 );
                         $(element).on('change',function() {
                             var current_value = this.value;
-                            var option1 = $('option:selected', this).attr('data-value');
-                            lpc_local.setItem('lpc_additional_price2',option1);
                             var elementParents   = $(element).parents().find('form.cart');
                             // var product_qty = $(elementParents).find('input[name=quantity]').val();
                             //call
@@ -348,92 +331,54 @@
         if ( logo_price2 == null || logo_price2 == '' ) {
             logo_price2 = 0;
         }
-        // console.log(logo_price1);
-        // var logo_price = (parseFloat(logo_price1) + parseFloat(logo_price2)) * product_qty ;
-        var logo_price = (parseFloat(logo_price1) + parseFloat(logo_price2));
-        var additional_price = logo_additional_price(product_qty);
-        var price_with_additional = parseFloat(products__price) + parseFloat(additional_price);
+        var logo_price = (parseFloat(logo_price1) + parseFloat(logo_price2)) * product_qty ;
 
-        var total_price = (parseInt(product_qty) * parseFloat(price_with_additional))  + parseFloat(logo_price);
-        // var total_price = percentance_condition(product_qty, total_price );
+        var total_price = product_qty * products__price + logo_price;
+
+        var total_price = percentance_condition(product_qty, total_price );
         var total_prices = eur_format(total_price);
         var log_price = parseFloat(logo_price1) + parseFloat(logo_price2);
         var log_prices = eur_format(logo_price);
-        var add_price = 0;
-        if (additional_price > 0 ) {
-            add_price = parseFloat(additional_price) * parseInt(product_qty);
-        }
-        var saving_format = eur_format(add_price);
+        var saving = logo_price_saving(product_qty);
+        var saving_format = eur_format(saving).replace('€', '');
         update_table(product_qty,log_price,total_prices,log_prices,saving_format);
     }
-
-    function logo_additional_price(quantity) {
-        var quantity = parseInt(quantity);
-        var add_price  = lpc_local.getItem('lpc_additional_price1');
-        var add_price2 = lpc_local.getItem('lpc_additional_price2');
-        var lpx_price1 = 0;
-        var lpx_price2 = 0;
-        if (add_price != null) {
-            var newarray = add_price.split(",");
-            var new_arrays = [];
-           newarray.forEach((value,index)=>{
-                var values = value.split("=");
-                var keys = parseInt(values[0]);
-                new_arrays[keys] = parseFloat(values[1].replace(/"|'/g, ''));
-           });
-           if ( quantity >= 20000 ) {
-                lpx_price1 = new_arrays[20000];
-            } else if( quantity >= 10000 && quantity < 20000 ) {
-                lpx_price1 = new_arrays[10000];
-             } else if ( quantity >= 5000 && quantity < 10000 ) {
-                lpx_price1 = new_arrays[5000];
-            } else if ( quantity >= 2500 && quantity < 5000 ) {
-                lpx_price1 = new_arrays[2500];
-             }else if ( quantity >= 1000 && quantity < 2500 ) {
-                lpx_price1 = new_arrays[1000];
-             }else if ( quantity >= 500 && quantity < 1000 ) {
-                lpx_price1 = new_arrays[250];
-             } else if ( quantity >= 250 && quantity < 500 ) {
-                lpx_price1 = new_arrays[250];
-             } else if ( quantity >= 100 && quantity < 250 ) {
-                lpx_price1 = new_arrays[100];
-             } else if ( quantity >= 50 && quantity < 100 ) {
-                lpx_price1 = new_arrays[50];
-             }
+    function logo_price_saving(quantity) {
+        if ( quantity >= 1000 ) {
+            return '14.59';
+        } else if( quantity >= 300 && quantity < 1000 ) {
+            return '12.79';
+        } else if ( quantity >= 150 && quantity < 300 ) {
+            return '10.39';
+        } else if ( quantity >= 75 && quantity < 150 ) {
+            return '7.87';
+        }else {
+            return '0';
         }
-        if (add_price2 != null) {
-            var newarray2 = add_price2.split(",");
-            var new_arrays2 = [];
-            newarray2.forEach((value,index)=>{
-                var values = value.split("=");
-                var keys = parseInt(values[0]);
-                new_arrays2[keys] = parseFloat(values[1].replace(/"|'/g, ''));
-           });
-        
-           if ( quantity >= 20000 ) {
-                lpx_price2 = new_arrays[20000];
-            } else if( quantity >= 10000 && quantity < 20000 ) {
-                lpx_price2 = new_arrays[10000];
-            } else if ( quantity >= 5000 && quantity < 10000 ) {
-                lpx_price2 = new_arrays[5000];
-            } else if ( quantity >= 2500 && quantity < 5000 ) {
-                lpx_price2 = new_arrays[2500];
-            }else if ( quantity >= 1000 && quantity < 2500 ) {
-                lpx_price2 = new_arrays[1000];
-            }else if ( quantity >= 500 && quantity < 1000 ) {
-                lpx_price2 = new_arrays[250];
-            } else if ( quantity >= 250 && quantity < 500 ) {
-                lpx_price2 = new_arrays[250];
-            } else if ( quantity >= 100 && quantity < 250 ) {
-                lpx_price2 = new_arrays[100];
-            } else if ( quantity >= 50 && quantity < 100 ) {
-                lpx_price2 = new_arrays[50];
-            }
-        }
-        var total_add = parseFloat(lpx_price1 + lpx_price2);
-        lpc_local.setItem('lpc_total_additional',total_add);
-        return total_add;
     }
+
+    function percentance_condition( quantity, total_price ) {
+        if ( quantity >= 1000 ) {
+            return percentance_calculation(14.59, total_price );
+        } else if( quantity >= 300 && quantity < 1000 ) {
+            return percentance_calculation(12.79, total_price );
+        } else if ( quantity >= 150 && quantity < 300 ) {
+            return percentance_calculation(10.39, total_price );
+        } else if ( quantity >= 75 && quantity < 150 ) {
+            return percentance_calculation(7.87, total_price );
+        }else {
+            return total_price;
+        }
+    }
+
+    function percentance_calculation(percentance, total_price ) {
+        var regular_price = total_price;
+        var new_width     = ( total_price * percentance ) / 100;
+        var final_price   = regular_price -  new_width;
+        return final_price.toFixed(3);
+    }
+
+
     function eur_format(value) {
         return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(value);
     }
@@ -443,7 +388,7 @@
         $(".lpc_logo_printing").html(log_prices );
         $(".lpc_inTotal").html(total_price);
         $('.lpc_total_logo_price').val(logo_price);
-        $('.lpc_saving').html(saving);
+        $('.lpc_saving').html(saving + '%' );
     }
 
     $(document).on('click', '.single_add_to_cart_button', function (e) {
@@ -497,13 +442,10 @@
                 var option_value = JSON.stringify(select_option_value);
 
                 var exits_class = self.find('input[name=lpc_total_logo_price]');
-                let extra_category = 0;
-                if (exits_class.length == 1) {
-                    extra_category = 1;
-                }
-                var exits_class2 = self.find('input[name=lpc_exits_condition]');
                 let quantity_total = 1;
-                if (exits_class2.length == 1 ) {
+                let extra_category = 0;
+                if (exits_class.length == 1 ) {
+                    extra_category = 1;
                     var quantity_value1 = self.find('.lpc_size_xs').val();
                     var quantity_value2 = self.find('.lpc_size_s').val();
                     var quantity_value3 = self.find('.lpc_size_m').val();
@@ -533,8 +475,7 @@
                         quantity_value7 = 0;
                     }
                      quantity_total = parseInt(quantity_value1) + parseInt(quantity_value2) + parseInt(quantity_value3) + parseInt(quantity_value4) + parseInt(quantity_value5) + parseInt(quantity_value6) + parseInt(quantity_value7);
-               
-                    } else {
+                } else {
                     quantity_total = product_qty;
                 }
                 var lpc_product_price  = self.find('.lpc_product_price').val() || 0;
@@ -576,14 +517,8 @@
                     'XXL':quantity_values6,
                     'XXXL':quantity_values7,
                 };
+           
 
-                //
-                // var additional_price
-                var lpc_add_total = lpc_local.getItem('lpc_total_additional');
-
-                if (lpc_add_total == null ) {
-                    lpc_add_total = 0;
-                }
                 var data = {
                     action: 'lpc_woocommerce_ajax_add_to_cart',
                     product_id: product_id,
@@ -593,7 +528,6 @@
                     lpc_total_logo_price:lpc_total_logo_price,
                     variation_values:option_value,
                     extra_category:extra_category,
-                    lpc_add_total:lpc_add_total,
                     sizeTotal:JSON.stringify(sizeTotals)
                 };
              
@@ -635,6 +569,3 @@ window.sessionStorage.removeItem('tc_select_size_2xl');
 window.sessionStorage.removeItem('tc_select_size_3xl');
 window.sessionStorage.removeItem('lpc_total_quontity');
 window.sessionStorage.removeItem('lpc_product_quontity');
-window.sessionStorage.removeItem('lpc_additional_price2');
-window.sessionStorage.removeItem('lpc_additional_price1');
-window.sessionStorage.removeItem('lpc_total_additional');

@@ -26,7 +26,7 @@
             lpc_local.setItem('lpc_product_quontity',product_qty);
             lpc_price_calculation(product_qty,products__price,logo_price1,logo_price2);
     });
-    $(document).on('keyup','[name="quantity"]', function(e) { 
+    $(document).on('keyup','[name="quantity"]', function(e) {
         var $thisbuttons = $(this),
         $form = $thisbuttons.closest('form.cart'),
         product_qty = $form.find('input[name=quantity]').val() || 1;
@@ -39,7 +39,7 @@
     
     $(document).on('click','.lpc_calculate_price_button', function(e) {
         e.preventDefault();
-        let self2 = $(this).parents('.extra_calculation_button_wrap');
+        let self = $(this).parents('.extra_calculation_button_wrap');
         self.find('.lpc_select_option').css("display",'none');
         self.find('.lpc_select_option').css("display",'block');
         var quantity_value1 = self.find('.lpc_size_xs').val();
@@ -50,10 +50,13 @@
         var quantity_value6 = self.find('.lpc_size_2xl').val();
         var quantity_value7 = self.find('.lpc_size_3xl').val();
         var product_qty     =  lpc_local.getItem('lpc_product_quontity');
+        if ( product_qty == null || isNaN(product_qty)) {
+            var $thisbuttons = $(this).parents(),
+            $form = $thisbuttons.find('form.cart');
+            product_qty = $form.find('input[name=quantity]').val() || 1;
+        }
         quantity_calculation(quantity_value1,quantity_value2,quantity_value3,quantity_value4,quantity_value5,quantity_value6,quantity_value7,product_qty);
     });
-   
-   
     $(document).on('keyup','.lpc_size_xs',function(){
         var $this = $(this).val();
         if ($this < 0 ) {
@@ -69,9 +72,6 @@
         var quantity_value7 = lpc_local.getItem('tc_select_size_3xl');
         quantity_calculation($this,quantity_value2,quantity_value3,quantity_value4,quantity_value5,quantity_value6,quantity_value7);
     });
-
-
-
     $(document).on('keyup','.lpc_size_s',function(){
         var $this = $(this).val();
         if ($this < 0 ) {
@@ -129,6 +129,7 @@
           $this = 0;
             $(this).val(0);
         }
+
         lpc_local.setItem('tc_select_size_xl',$this);
         var quantity_value1 = lpc_local.getItem('tc_select_size_xs');
         var quantity_value2 = lpc_local.getItem('tc_select_size_s');
@@ -494,14 +495,13 @@
                 } else {
                     lpc_total_logo_price = lpc_total_logo_price2
                 }
-                var option_value = JSON.stringify(select_option_value);
-
                 var exits_class = self.find('input[name=lpc_total_logo_price]');
                 let extra_category = 0;
                 if (exits_class.length == 1) {
                     extra_category = 1;
                 }
                 var exits_class2 = self.find('input[name=lpc_exits_condition]');
+                var self_error = self.find('.lpc_show_any_error');
                 let quantity_total = 1;
                 if (exits_class2.length == 1 ) {
                     var quantity_value1 = self.find('.lpc_size_xs').val();
@@ -532,10 +532,28 @@
                     if (quantity_value7 == null || quantity_value7 == '' ) {
                         quantity_value7 = 0;
                     }
+                    if( ! 'attribute_pa_new' in select_option_value ) {
+                        select_option_value.attribute_pa_koko = "l";
+                    }
                      quantity_total = parseInt(quantity_value1) + parseInt(quantity_value2) + parseInt(quantity_value3) + parseInt(quantity_value4) + parseInt(quantity_value5) + parseInt(quantity_value6) + parseInt(quantity_value7);
-               
+                        if (quantity_total< 50) {
+                            $(self_error).html('Tuotteen minimitilausmäärä on 50');
+                            setTimeout(function(){
+                                $(self_error).html('');
+                            }, 5000);
+                            return false;
+                        }
                     } else {
                     quantity_total = product_qty;
+                    if (exits_class.length == '1' ) {
+                        if (quantity_total< 50) {
+                            $(self_error).html('Tuotteen minimitilausmäärä on 50');
+                            setTimeout(function(){
+                                $(self_error).html('');
+                            }, 5000);
+                            return false;
+                        }
+                    }
                 }
                 var lpc_product_price  = self.find('.lpc_product_price').val() || 0;
                 let quantity_values1 = self.find('.lpc_size_xs').val();
@@ -584,6 +602,10 @@
                 if (lpc_add_total == null ) {
                     lpc_add_total = 0;
                 }
+                // console.log(select_option_value)
+                var option_value = JSON.stringify(select_option_value);
+                
+                //
                 var data = {
                     action: 'lpc_woocommerce_ajax_add_to_cart',
                     product_id: product_id,
@@ -611,7 +633,6 @@
                 // console.log(response);
             },
             success: function (response) {
-                console.log(response);
                 if (response.error && response.product_url) {
                     window.location = response.product_url;
                     return;

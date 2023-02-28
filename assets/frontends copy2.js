@@ -670,3 +670,5 @@ window.sessionStorage.removeItem('tc_select_size_xxl');
 window.sessionStorage.removeItem('tc_select_size_3xl');
 window.sessionStorage.removeItem('lpc_total_quontity');
 window.sessionStorage.removeItem('lpc_product_quontity');
+
+

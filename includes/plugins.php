@@ -69,9 +69,10 @@ final class Plugin {
 	}
 
     public function frontend_scripts() {
-        wp_enqueue_style( 'lpc_frontend_css', LPC_URL . 'assets/frontend.css');
+        wp_enqueue_style( 'lpc_frontend_css', LPC_URL . 'assets/frontend.css', [],time(),false );
+
         if (function_exists('is_product') && is_product()) {
-            wp_enqueue_script( 'lpc_frontends_js', LPC_URL . 'assets/frontends.js', [ 'jquery' ], LPC_VERSION, false );
+            wp_enqueue_script( 'lpc_frontends_js', LPC_URL . 'assets/frontends11.js', [ 'jquery' ], time(), false );
         }
       
     }
@@ -106,7 +107,9 @@ final class Plugin {
     }
 
     public function includes_files() {
+		require_once LPC_INCLUDES . '/functions.php';
 		require_once LPC_INCLUDES . '/class-hook.php';
+		// require_once LPC_INCLUDES . '/class-upload-logo.php';
 
     }
 	/**

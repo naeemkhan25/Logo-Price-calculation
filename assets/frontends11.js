@@ -8,11 +8,30 @@
         var all_select_option = $(extra_rand_vals).find('select');
         all_select_option.each((index,element)=>{
             $(element).on('change',function(){
+                var $this = $(this).val();
+                lpc_local.setItem('lpc_logo_select_option',$this);
+                var new_value = $(this).parents('.variations_form');
+                var new2 = $(new_value).find('#lpc_quontity_size_total');
+                var all_inputs = $(new2).find('input:text');
+                var new23 = $(new_value).find('.lpc_label_show_hides');
+                all_inputs.each((index,element)=>{
+                    var get_value = $(element).attr('id').split('-');
+                    if( get_value[1] == $this ) {
+                        $(element).parent('td').show();
+                    } else {
+                        $(element).parent('td').hide();
+                    }
+                });
                 lpc_local.removeItem('lpc_logo_price1');
                 lpc_local.removeItem('lpc_logo_price2');
                 lpc_local.removeItem('lpc_additional_price1');
                 lpc_local.removeItem('lpc_additional_price2');
                 lpc_local.removeItem('lpc_total_additional');
+                //new 
+                lpc_local.removeItem('lpc_logo_price1_option');
+                lpc_local.removeItem('lpc_logo_price1_color');
+                lpc_local.removeItem('lpc_logo_price2_option');
+                lpc_local.removeItem('lpc_logo_price2_color');
             });
         });
     });
@@ -20,185 +39,68 @@
             var $thisbuttons = $(this),
             $form = $thisbuttons.closest('form.cart'),
             product_qty = $form.find('input[name=quantity]').val() || 1;
-            products__price  = $('.lpc_product_price').val() || 0;
-            var logo_price1 = lpc_local.getItem('lpc_logo_price1');
-            var logo_price2 = lpc_local.getItem('lpc_logo_price2');
+             products__price  = $('.lpc_product_price').val() || 0;
             lpc_local.setItem('lpc_product_quontity',product_qty);
-            lpc_price_calculation(product_qty,products__price,logo_price1,logo_price2);
+            quantity_calculation();
     });
-    $(document).on('keyup','[name="quantity"]', function(e) { 
+    $(document).on('keyup','[name="quantity"]', function(e) {
         var $thisbuttons = $(this),
         $form = $thisbuttons.closest('form.cart'),
         product_qty = $form.find('input[name=quantity]').val() || 1;
         products__price  = $('.lpc_product_price').val() || 0;
-        var logo_price1 = lpc_local.getItem('lpc_logo_price1');
-        var logo_price2 = lpc_local.getItem('lpc_logo_price2');
         lpc_local.setItem('lpc_product_quontity',product_qty);
-        lpc_price_calculation(product_qty,products__price,logo_price1,logo_price2);
+        quantity_calculation();
     });
     
     $(document).on('click','.lpc_calculate_price_button', function(e) {
         e.preventDefault();
-        let self2 = $(this).parents('.extra_calculation_button_wrap');
+        // console.log('hi');
+        var self = $(this).parents('form.cart');
+        if ( self.length == 0 ) {
+            self = $(this).parents('.extra_calculation_button_wrap');
+        }
         self.find('.lpc_select_option').css("display",'none');
         self.find('.lpc_select_option').css("display",'block');
-        var quantity_value1 = self.find('.lpc_size_xs').val();
-        var quantity_value2 = self.find('.lpc_size_s').val();
-        var quantity_value3 = self.find('.lpc_size_m').val();
-        var quantity_value4 = self.find('.lpc_size_l').val();
-        var quantity_value5 = self.find('.lpc_size_xl').val();
-        var quantity_value6 = self.find('.lpc_size_2xl').val();
-        var quantity_value7 = self.find('.lpc_size_3xl').val();
-        var product_qty     =  lpc_local.getItem('lpc_product_quontity');
-        quantity_calculation(quantity_value1,quantity_value2,quantity_value3,quantity_value4,quantity_value5,quantity_value6,quantity_value7,product_qty);
-    });
-   
-   
-    $(document).on('keyup','.lpc_size_xs',function(){
-        var $this = $(this).val();
-        if ($this < 0 ) {
-            $(this).val(0);
-            $this = 0;
-        }
-        lpc_local.setItem('tc_select_size_xs',$this);
-        var quantity_value2 = lpc_local.getItem('tc_select_size_s');
-        var quantity_value3 = lpc_local.getItem('tc_select_size_m');
-        var quantity_value4 = lpc_local.getItem('tc_select_size_l');
-        var quantity_value5 = lpc_local.getItem('tc_select_size_xl');
-        var quantity_value6 = lpc_local.getItem('tc_select_size_2xl');
-        var quantity_value7 = lpc_local.getItem('tc_select_size_3xl');
-        quantity_calculation($this,quantity_value2,quantity_value3,quantity_value4,quantity_value5,quantity_value6,quantity_value7);
+        quantity_calculation();
     });
 
-
-
-    $(document).on('keyup','.lpc_size_s',function(){
-        var $this = $(this).val();
-        if ($this < 0 ) {
-            $(this).val(0);
-            $this = 0;
-        }
-        lpc_local.setItem('tc_select_size_s',$this);
-        var quantity_value1 = lpc_local.getItem('tc_select_size_xs');
-        var quantity_value3 = lpc_local.getItem('tc_select_size_m');
-        var quantity_value4 = lpc_local.getItem('tc_select_size_l');
-        var quantity_value5 = lpc_local.getItem('tc_select_size_xl');
-        var quantity_value6 = lpc_local.getItem('tc_select_size_2xl');
-        var quantity_value7 = lpc_local.getItem('tc_select_size_3xl');
-        quantity_calculation(quantity_value1,$this,quantity_value3,quantity_value4,quantity_value5,quantity_value6,quantity_value7);
+    $(document).ready(function(){
+        var quontity_table_value = document.querySelectorAll(
+            "#lpc_quontity_size_total"
+         );
+         var all_input_option = $(quontity_table_value).find('input[name=lpc_size_q]');
+         all_input_option.each((index,element)=>{
+            $(element).on('keyup',function(){
+                quantity_calculation();
+            });
+         });
     });
-
-    $(document).on('keyup','.lpc_size_m',function(){
-        var $this = $(this).val();
-        if ($this < 0 ) {
-            $(this).val(0);
-           $this = 0;
+    function quantity_calculation() {
+        var select_value = lpc_local.getItem('lpc_logo_select_option');
+        var quontity_table_value = document.querySelectorAll(
+            "#lpc_quontity_size_total"
+         );
+         var all_input_option = $(quontity_table_value).find('input[name=lpc_size_q]');
+            var sum = 0;
+            all_input_option.each((index,element)=>{
+                var attr_value = $(element).attr('id').split('-');
+                if(attr_value[1] == select_value) {
+                    var element_value = $(element).val();
+                    if(isNaN(element_value) || element_value == null || element_value == '') {
+                        element_value = 0;
+                    }
+                    sum = sum + parseInt(element_value);
+                }
+            })
+        var product_qty = lpc_local.getItem('lpc_product_quontity');
+        if( product_qty == null || isNaN(product_qty) || product_qty == 'undefined' ){
+            product_qty = 0;
         }
-        lpc_local.setItem('tc_select_size_m',$this);
-        var quantity_value1 = lpc_local.getItem('tc_select_size_xs');
-        var quantity_value2 = lpc_local.getItem('tc_select_size_s');
-        var quantity_value4 = lpc_local.getItem('tc_select_size_l');
-        var quantity_value5 = lpc_local.getItem('tc_select_size_xl');
-        var quantity_value6 = lpc_local.getItem('tc_select_size_2xl');
-        var quantity_value7 = lpc_local.getItem('tc_select_size_3xl');
-        quantity_calculation(quantity_value1,quantity_value2,$this,quantity_value4,quantity_value5,quantity_value6,quantity_value7);
-        
-
-    });
-    $(document).on('keyup','.lpc_size_l',function(){
-        var $this = $(this).val();
-        if ($this < 0 ) {
-            $(this).val(0);
-            $this = 0;
-        }
-
-        lpc_local.setItem('tc_select_size_l',$this);
-        var quantity_value1 = lpc_local.getItem('tc_select_size_xs');
-        var quantity_value2 = lpc_local.getItem('tc_select_size_s');
-        var quantity_value3 = lpc_local.getItem('tc_select_size_m');
-
-        var quantity_value5 = lpc_local.getItem('tc_select_size_xl');
-        var quantity_value6 = lpc_local.getItem('tc_select_size_2xl');
-        var quantity_value7 = lpc_local.getItem('tc_select_size_3xl');
-        quantity_calculation(quantity_value1,quantity_value2,quantity_value3,$this,quantity_value5,quantity_value6,quantity_value7);
-
-    });
-    $(document).on('keyup','.lpc_size_xl',function(){
-        var $this = $(this).val();
-        if ($this < 0 ) {
-          $this = 0;
-            $(this).val(0);
-        }
-        lpc_local.setItem('tc_select_size_xl',$this);
-        var quantity_value1 = lpc_local.getItem('tc_select_size_xs');
-        var quantity_value2 = lpc_local.getItem('tc_select_size_s');
-        var quantity_value3 = lpc_local.getItem('tc_select_size_m');
-        var quantity_value4 = lpc_local.getItem('tc_select_size_l');
-
-        var quantity_value6 = lpc_local.getItem('tc_select_size_2xl');
-        var quantity_value7 = lpc_local.getItem('tc_select_size_3xl');
-        quantity_calculation(quantity_value1,quantity_value2,quantity_value3,quantity_value4,$this,quantity_value6,quantity_value7);
-    });
-    $(document).on('keyup','.lpc_size_2xl',function(){
-        var $this = $(this).val();
-        if ($this < 0 ) {
-            
-            $(this).val(0);
-            $this = 0;
-        }
-        lpc_local.setItem('tc_select_size_2xl',$this);
-        var quantity_value2 = lpc_local.getItem('tc_select_size_s');
-        var quantity_value3 = lpc_local.getItem('tc_select_size_m');
-        var quantity_value4 = lpc_local.getItem('tc_select_size_l');
-        var quantity_value5 = lpc_local.getItem('tc_select_size_xl');
-        var quantity_value1 = lpc_local.getItem('tc_select_size_xs');
-        var quantity_value7 = lpc_local.getItem('tc_select_size_3xl');
-        quantity_calculation(quantity_value1,quantity_value2,quantity_value3,quantity_value4,quantity_value5,$this,quantity_value7);
-    });
-    $(document).on('keyup','.lpc_size_3xl',function(){
-        var $this = $(this).val();
-        if ($this < 0 ) {
-            $(this).val(0);
-            $this = 0;
-        }
-        lpc_local.setItem('tc_select_size_3xl',$this);
-        var quantity_value2 = lpc_local.getItem('tc_select_size_s');
-        var quantity_value3 = lpc_local.getItem('tc_select_size_m');
-        var quantity_value4 = lpc_local.getItem('tc_select_size_l');
-        var quantity_value5 = lpc_local.getItem('tc_select_size_xl');
-        var quantity_value6 = lpc_local.getItem('tc_select_size_2xl');
-        var quantity_value1 = lpc_local.getItem('tc_select_size_xs');
-        quantity_calculation(quantity_value1,quantity_value2,quantity_value3,quantity_value4,quantity_value5,quantity_value6,$this);
-
-    });
-
-    function quantity_calculation(quantity_value1,quantity_value2,quantity_value3,quantity_value4,quantity_value5,quantity_value6,quantity_value7,product_qty = 0 ) {
-        if (quantity_value1 == null || quantity_value1 == '' ) {
-            quantity_value1 = 0;
-        }
-
-        if (quantity_value2 == null  || quantity_value2 == '' ) {
-            quantity_value2 = 0;
-        }
-        if (quantity_value3 == null || quantity_value3 == '' ) {
-            quantity_value3 = 0;
-        }
-        if (quantity_value4 == null || quantity_value4 == '' ) {
-            quantity_value4 = 0;
-        }
-        if (quantity_value5 == null || quantity_value5 == '' ) {
-            quantity_value5 = 0;
-        }
-        if (quantity_value6 == null || quantity_value6 == '' ) {
-            quantity_value6 = 0;
-        }
-        if (quantity_value7 == null || quantity_value7 == '' ) {
-            quantity_value7 = 0;
-        }
-
-        var quontity_total = parseInt(quantity_value1) + parseInt(quantity_value2) + parseInt(quantity_value3) + parseInt(quantity_value4) + parseInt(quantity_value5) + parseInt(quantity_value6) + parseInt(quantity_value7);
-        if ( quontity_total == 0 ) {
-            quontity_total = parseInt(quontity_total) + parseInt(product_qty);
+        var quontity_total = 0; 
+        if ( sum == 0 ) {
+            quontity_total = parseInt(sum) + parseInt(product_qty);
+        }else {
+            quontity_total = parseInt(sum); 
         }
         if ( quontity_total == 0 ) {
             quontity_total = 1;
@@ -206,23 +108,28 @@
         var logo_price1 = lpc_local.getItem('lpc_logo_price2');
         lpc_local.setItem('lpc_total_quontity',quontity_total);
         var logo_price2 = lpc_local.getItem('lpc_logo_price1');
-        var products__price  = $('.lpc_product_price').val() || 0;
+        var products__price  = $('.lpc_product_price1').val() || 0;
         lpc_price_calculation(quontity_total,products__price,logo_price1,logo_price2);
     }
 
     $(document).on('change','.lpc_logo_main_select', function(e) {
         var select_value = this.value;
-        // console.log(select_value);
         if ( select_value == 'none' ) {
             select_value = 'lpc_logo1_parents-none';
         }
+        var selected_option = $('option:selected', this).text();
+        // console.log(selected_option);
+        lpc_local.setItem('lpc_logo_price1_option',selected_option);
+
         var replace_value = select_value.split('-');
         var value_of_first = replace_value[0];
         var $this = $(this);
         var parents_info = $this.parents().closest('.lpc_select_option');
         var select_values = parents_info.find('select');
-        select_values.each((index,element)=>{
+        select_values.each((index,element)=>{    
            var classAttr = $(element).parent().attr('class');
+        //    console.log(classAttr);
+
            var replace_valuew = classAttr.split('-');
            var value_of_firstw = replace_valuew[0];
             if (value_of_first == value_of_firstw ) {
@@ -230,24 +137,29 @@
                     $(element).parent().css('display','none');
                     lpc_local.removeItem('lpc_logo_price1');
                     lpc_local.removeItem('lpc_additional_price1');
+
+                    lpc_local.removeItem('lpc_logo_price1_option');
+                    lpc_local.removeItem('lpc_logo_price1_color');
+
                     var elementParents   = $(element).parents().find('form.cart');
-                    // var product_qty = $(elementParents).find('input[name=quantity]').val();
                     var pproduct_qtys = lpc_local.getItem('lpc_total_quontity') || 1;
                     var Snd_local_storage = lpc_local.getItem('lpc_logo_price2');
                     var products__price  = $('.lpc_product_price').val() || 0;
                     lpc_price_calculation(pproduct_qtys,products__price,0,Snd_local_storage );
-                    //call
                 } else {
                     if ( classAttr == select_value) {
+                        
                         var logo_price_1 = $(element).val();
-                        // var attr_value = $(element).attr('data-value');
                         var option = $('option:selected', element).attr('data-value');
+
+                        var selected_option_color = $('option:selected', element).text();
+
+                        lpc_local.setItem('lpc_logo_price1_color',selected_option_color);
+                        
                         lpc_local.setItem('lpc_additional_price1',option);
-                        // console.log(element);
-                        //call
                         lpc_local.setItem('lpc_logo_price1',logo_price_1);
+
                         var elementParents   = $(element).parents().find('form.cart');
-                        // var product_qty = $(elementParents).find('input[name=quantity]').val();
                         var pproduct_qtys = lpc_local.getItem('lpc_total_quontity') || 1;
                         var Snd_local_storage = lpc_local.getItem('lpc_logo_price2');
                         var products__price  = $('.lpc_product_price').val() || 0;
@@ -255,12 +167,18 @@
                         $(element).on('change',function() {
                             var current_value = this.value;
                             var option1 = $('option:selected', this).attr('data-value');
+
+                            var selected_option_color1 = $('option:selected', this).text();
+
+                            lpc_local.setItem('lpc_logo_price1_color',selected_option_color1);
+
                             lpc_local.setItem('lpc_additional_price1',option1);
                             //call
                             lpc_local.setItem('lpc_logo_price1',current_value);
                             var elementParents   = $(element).parents().find('form.cart');
                             // var product_qty = $(elementParents).find('input[name=quantity]').val();
                             var pproduct_qtys = lpc_local.getItem('lpc_total_quontity') || 1;
+                            // console.log(pproduct_qtys);
                             var Snd_local_storage = lpc_local.getItem('lpc_logo_price2');
                             var products__price  = $('.lpc_product_price').val() || 0;
                             lpc_price_calculation(pproduct_qtys,products__price,current_value,Snd_local_storage );
@@ -275,14 +193,16 @@
         })
     });
 
-
-
     $(document).on('change','.lpc_logo_main_select2', function(e) {
         var select_value = this.value;
       
         if ( select_value == 'none' ) {
             select_value = 'lpc_logo2_parents-none';
         }
+        var selected_option2 = $('option:selected', this).text();
+
+        lpc_local.setItem('lpc_logo_price2_option',selected_option2);
+
         var replace_value = select_value.split('-');
         var value_of_first = replace_value[0];
         var $this = $(this);
@@ -297,6 +217,10 @@
                     $(element).parent().css('display','none');
                     lpc_local.removeItem('lpc_logo_price2');
                     lpc_local.removeItem('lpc_additional_price2');
+
+                    lpc_local.removeItem('lpc_logo_price2_option');
+                    lpc_local.removeItem('lpc_logo_price2_color');
+
                     var elementParents   = $(element).parents().find('form.cart');
                     // var product_qty = $(elementParents).find('input[name=quantity]').val();
                     var pproduct_qtys = lpc_local.getItem('lpc_total_quontity') || 1;
@@ -311,6 +235,9 @@
                         lpc_local.setItem('lpc_additional_price2',option);
                         var elementParents   = $(element).parents().find('form.cart');
                         // var product_qty = $(elementParents).find('input[name=quantity]').val();
+                        var selected_option_color2 = $('option:selected', element).text();
+
+                         lpc_local.setItem('lpc_logo_price2_color',selected_option_color2);
 
                         var pproduct_qtys = lpc_local.getItem('lpc_total_quontity') || 1;
                         //call
@@ -325,6 +252,10 @@
                             var elementParents   = $(element).parents().find('form.cart');
                             // var product_qty = $(elementParents).find('input[name=quantity]').val();
                             //call
+                            var selected_option_color2 = $('option:selected', this).text();
+
+                            lpc_local.setItem('lpc_logo_price2_color',selected_option_color2);
+
                             var pproduct_qtys = lpc_local.getItem('lpc_total_quontity') || 1;
                             lpc_local.setItem('lpc_logo_price2',current_value);
                             var first_local_storage = lpc_local.getItem('lpc_logo_price1');
@@ -444,6 +375,7 @@
         $(".lpc_inTotal").html(total_price);
         $('.lpc_total_logo_price').val(logo_price);
         $('.lpc_saving').html(saving);
+        $('.cart .woocommerce-Price-amount').html(total_price);
     }
 
     $(document).on('click', '.single_add_to_cart_button', function (e) {
@@ -494,99 +426,84 @@
                 } else {
                     lpc_total_logo_price = lpc_total_logo_price2
                 }
-                var option_value = JSON.stringify(select_option_value);
-
                 var exits_class = self.find('input[name=lpc_total_logo_price]');
                 let extra_category = 0;
                 if (exits_class.length == 1) {
                     extra_category = 1;
                 }
+                var active_select = lpc_local.getItem('lpc_logo_select_option');
                 var exits_class2 = self.find('input[name=lpc_exits_condition]');
-                let quantity_total = 1;
+                var self_error = self.find('.lpc_show_any_error');
+                let quantity_total = 0;
+
+                var product_id_collection = {};
+                var sizeTotals = {};
+                var lpc_size_active = 0;
                 if (exits_class2.length == 1 ) {
-                    var quantity_value1 = self.find('.lpc_size_xs').val();
-                    var quantity_value2 = self.find('.lpc_size_s').val();
-                    var quantity_value3 = self.find('.lpc_size_m').val();
-                    var quantity_value4 = self.find('.lpc_size_l').val();
-                    var quantity_value5 = self.find('.lpc_size_xl').val();
-                    var quantity_value6 = self.find('.lpc_size_2xl').val();
-                    var quantity_value7 = self.find('.lpc_size_3xl').val();
-                    if (quantity_value1 == null || quantity_value1 == '' ) {
-                        quantity_value1 = 0;
+                    lpc_size_active = 1;  
+                    var quontity_table_value = self.find("#lpc_quontity_size_total");
+                    var all_input_option = $(quontity_table_value).find('input[name=lpc_size_q]');
+                     all_input_option.each((index,element)=>{
+                        var attr_value = $(element).attr('id').split('-');
+                        if(attr_value[1] == active_select) {
+                            var quantity_value1_size = self.find(element).siblings('input');
+                            var find_size = $(quantity_value1_size).attr('id').split('-');
+                            var find_product_id = $(quantity_value1_size).val();
+                            var element_value = $(element).val();
+                            if(element_value != 0) {
+                                product_id_collection[find_size[1]] = find_product_id;
+                                sizeTotals[find_size[1]] = element_value;
+                                quantity_total = quantity_total + parseInt(element_value);
+                            }
+                        }
+                    }); 
+                    if (quantity_total<= 0 ) {
+                        $(self_error).html('ole hyvä ja valitse koko');
+                            setTimeout(function(){
+                                $(self_error).html('');
+                            }, 5000);
+                        return false;
                     }
-                    if (quantity_value2 == null  || quantity_value2 == '' ) {
-                        quantity_value2 = 0;
-                    }
-                    if (quantity_value3 == null || quantity_value3 == '' ) {
-                        quantity_value3 = 0;
-                    }
-                    if (quantity_value4 == null || quantity_value4 == '' ) {
-                        quantity_value4 = 0;
-                    }
-                    if (quantity_value5 == null || quantity_value5 == '' ) {
-                        quantity_value5 = 0;
-                    }
-                    if (quantity_value6 == null || quantity_value6 == '' ) {
-                        quantity_value6 = 0;
-                    }
-                    if (quantity_value7 == null || quantity_value7 == '' ) {
-                        quantity_value7 = 0;
-                    }
-                     quantity_total = parseInt(quantity_value1) + parseInt(quantity_value2) + parseInt(quantity_value3) + parseInt(quantity_value4) + parseInt(quantity_value5) + parseInt(quantity_value6) + parseInt(quantity_value7);
-               
-                    } else {
+                    product_id = JSON.stringify(product_id_collection);
+                } else {
                     quantity_total = product_qty;
                 }
-                var lpc_product_price  = self.find('.lpc_product_price').val() || 0;
-                let quantity_values1 = self.find('.lpc_size_xs').val();
-                let quantity_values2 = self.find('.lpc_size_s').val();
-                let quantity_values3 = self.find('.lpc_size_m').val();
-                let quantity_values4 = self.find('.lpc_size_l').val();
-                let quantity_values5 = self.find('.lpc_size_xl').val();
-                let quantity_values6 = self.find('.lpc_size_2xl').val();
-                let quantity_values7 = self.find('.lpc_size_3xl').val();
-                if ( 'undefined' == typeof quantity_values1) {
-                    quantity_values1 = 0;
-                }
-                if ( 'undefined' == typeof quantity_values2) {
-                    quantity_values2 = 0;
-                }
-                if ( 'undefined' == typeof quantity_values3) {
-                    quantity_values3 = 0;
-                }
-                if ( 'undefined' == typeof quantity_values4) {
-                    quantity_values4 = 0;
-                }
-                if ( 'undefined' == typeof quantity_values5) {
-                    quantity_values5 = 0;
-                }
-
-                if ( 'undefined' == typeof quantity_values6) {
-                    quantity_values6 = 0;
-                }
-                if ( 'undefined' == typeof quantity_values7) {
-                    quantity_values7 = 0;
-                }
-                var sizeTotals = {
-                    'XS':quantity_values1,
-                    'S':quantity_values2,
-                    'M':quantity_values3,
-                    'L':quantity_values4,
-                    'XL':quantity_values5,
-                    'XXL':quantity_values6,
-                    'XXXL':quantity_values7,
-                };
-
-                //
-                // var additional_price
                 var lpc_add_total = lpc_local.getItem('lpc_total_additional');
-
+                var lpc_product_price  = self.find('.lpc_product_price').val() || 0;
                 if (lpc_add_total == null ) {
                     lpc_add_total = 0;
                 }
+                var quantity_condition_value = self.find('.lpc_quontity_set').val();
+                if (quantity_total< quantity_condition_value ) {
+                    $(self_error).html('Tuotteen minimitilausmäärä on '+quantity_condition_value);
+                    setTimeout(function(){
+                        $(self_error).html('');
+                    }, 5000);
+                    return false;
+                }
+                var option_value = JSON.stringify(select_option_value);
+                var logo1_option = lpc_local.getItem('lpc_logo_price1_option');
+                var logo1_color  = lpc_local.getItem('lpc_logo_price1_color');
+                var logo2_option = lpc_local.getItem('lpc_logo_price2_option');
+                var logo2_color  = lpc_local.getItem('lpc_logo_price2_color');
+                if (logo1_option == null ) {
+                    logo1_option = 'Logo 1 is not selected'
+                }
+                if (logo1_color == null ) {
+                    logo1_color = 'Logo 1 color is not selected'
+                }
+                if (logo2_option == null ) {
+                    logo2_option = 'Logo 2 is not selected'
+                }
+                if (logo2_color == null ) {
+                    logo2_color = 'Logo 2 color is not selected'
+                }
+
+
                 var data = {
                     action: 'lpc_woocommerce_ajax_add_to_cart',
                     product_id: product_id,
+                    lpc_size_active:lpc_size_active,
                     product_sku: '',
                     quantity: quantity_total,
                     lpc_product_price:lpc_product_price,
@@ -594,7 +511,12 @@
                     variation_values:option_value,
                     extra_category:extra_category,
                     lpc_add_total:lpc_add_total,
-                    sizeTotal:JSON.stringify(sizeTotals)
+                    sizeTotal:JSON.stringify(sizeTotals),
+                    logo1_option_select:logo1_option,
+                    logo1_option_color_select:logo1_color,
+                    logo2_option_select:logo2_option,
+                    logo2_option_color_select:logo2_color,
+
                 };
              
         $(document.body).trigger('adding_to_cart', [$thisbutton, data]);
@@ -611,7 +533,6 @@
                 // console.log(response);
             },
             success: function (response) {
-                console.log(response);
                 if (response.error && response.product_url) {
                     window.location = response.product_url;
                     return;
@@ -625,16 +546,15 @@
     });
 })(jQuery);
 window.sessionStorage.removeItem('lpc_logo_price2');
+window.sessionStorage.removeItem('lpc_logo_select_option');
 window.sessionStorage.removeItem('lpc_logo_price1');
-window.sessionStorage.removeItem('tc_select_size_s');
-window.sessionStorage.removeItem('tc_select_size_xs');
-window.sessionStorage.removeItem('tc_select_size_m');
-window.sessionStorage.removeItem('tc_select_size_l');
-window.sessionStorage.removeItem('tc_select_size_xl');
-window.sessionStorage.removeItem('tc_select_size_2xl');
-window.sessionStorage.removeItem('tc_select_size_3xl');
 window.sessionStorage.removeItem('lpc_total_quontity');
 window.sessionStorage.removeItem('lpc_product_quontity');
 window.sessionStorage.removeItem('lpc_additional_price2');
 window.sessionStorage.removeItem('lpc_additional_price1');
 window.sessionStorage.removeItem('lpc_total_additional');
+//new
+window.sessionStorage.removeItem('lpc_logo_price1_option');
+window.sessionStorage.removeItem('lpc_logo_price1_color');
+window.sessionStorage.removeItem('lpc_logo_price2_option');
+window.sessionStorage.removeItem('lpc_logo_price2_color');

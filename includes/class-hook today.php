@@ -9,42 +9,103 @@ if ( ! class_exists('LPC_Frontend_Hook') ) {
             add_action( 'woocommerce_before_calculate_totals', [$this,'lpc__custom_price_refresh'] );
             // add_filter( 'wc_epo_add_cart_item_original_price', [$this,'lpc_price'],10,2);
             add_filter( 'woocommerce_cart_item_name', [$this,'change_product_name'],20, 3 );
-            add_action('woocommerce_checkout_create_order_line_item', [ $this, 'save_file_type_as_order_item_meta'], 20, 4);
+            add_filter( 'woocommerce_is_sold_individually', [$this,'hide_woocommerce_quantity_input'], 10, 2 );
         }
-        public function save_file_type_as_order_item_meta($item, $cart_item_key, $values, $order) {
-            if($values['logo1_option'] != 'Logo 1 is not selected' ) {
-                $item->update_meta_data( 'Valittu  Printti', $values['logo1_option'] );
+
+        public function hide_woocommerce_quantity_input( $quantity, $product ) {
+            if ( ! is_product() ) {
+                return $quantity;
             }
-            if($values['logo1_color'] != 'Logo 1 color is not selected' ) {
-                $item->update_meta_data( 'Printin  tyyli', $values['logo1_color'] );
+            $parent_id = $product->get_parent_id();
+            if ( $parent_id > 0 ) {
+                $_product = wc_get_product( $parent_id );
+                $category_ids = $_product->get_category_ids();
+            } else {
+                $category_ids = $product->get_category_ids();
+            }          
+             $category_name = [];
+             if( is_array($category_ids) ) {
+                foreach ( $category_ids as $key =>$id ) {
+                    $acf_value = get_fields("term_$id");
+                    if(!empty($acf_value)) {
+                        $category_name[$key] = array_key_exists('would_you_like_to_display_quantity_fields',$acf_value) ? $acf_value['would_you_like_to_display_quantity_fields'] : 'no';
+                    }
+                }
+             }
+            if (in_array('yes',$category_name)) {
+                return true;
             }
-            if($values['logo2_option'] != 'Logo 2 is not selected' ) {
-                $item->update_meta_data( 'Valittu 2 Printti', $values['logo2_option'] );
-            }
-            if ( $values['logo2_color'] != 'Logo 2 color is not selected' ) {
-                $item->update_meta_data( 'Printin 2 tyyli', $values['logo2_color'] );
-            }
-            // if ( array_key_exists('lpc_total_logo_price',$values) ) {
-            //     $logo_price = wc_price($values['lpc_total_logo_price']);
-            //     $item->update_meta_data( 'Set Up Charge Per Quontity', $logo_price );
-            // }
-            // if ( array_key_exists('lpc_add_total',$values ) ) {
-            //     $saving = $values['lpc_quantity'] * $values['lpc_add_total'];
-            //     $saving = wc_price($saving);
-            //     $item->update_meta_data( 'Additional Charge', $saving );
-            // }
+            return false;
         }
+
         public function change_product_name( $title, $cart_item, $cart_item_key ) {
             $newTitle = $title;
-            if ( array_key_exists('lpc_total_logo_price',$cart_item) ) {
-                $logo_price = wc_price($cart_item['lpc_total_logo_price']);
-                $newTitle .= "<br/>".__("Setup Charge per Quantity","logo-price-calculation").':'. $logo_price;
+            if ( array_key_exists('lpc_show_logo_price',$cart_item) ) {
+                $logo_price = wc_price($cart_item['lpc_show_logo_price']);
+                $newTitle .= "<br/>"."Setup Charge : $logo_price";
+            }
+            // print_r($cart_item);
+
+            if ( array_key_exists('size_name',$cart_item ) ) {
+                if ( $cart_item['size_name']->XS > 0 ) {
+                    $xs =  $cart_item['size_name']->XS;
+                    $newTitle .= "<br/>"."Koko XS : $xs";
+                }
+            }
+            if ( array_key_exists('size_name',$cart_item ) ) {
+                if ( $cart_item['size_name']->S > 0 ) {
+                    $s =  $cart_item['size_name']->S;
+                    $newTitle .= "<br/>"."Koko S : $s";
+                }
+            }
+            if ( array_key_exists('size_name',$cart_item ) ) {
+                if ( $cart_item['size_name']->M > 0 ) {
+                    $xs =  $cart_item['size_name']->M;
+                    $newTitle .= "<br/>"."Koko M : $xs";
+                }
+            }
+            if ( array_key_exists('size_name',$cart_item ) ) {
+                if ( $cart_item['size_name']->L > 0 ) {
+                    $xs =  $cart_item['size_name']->L;
+                    $newTitle .= "<br/>"."Koko L : $xs";
+                }
+            }
+            if ( array_key_exists('size_name',$cart_item ) ) {
+                if ( $cart_item['size_name']->XL > 0 ) {
+                    $xs =  $cart_item['size_name']->XL;
+                    $newTitle .= "<br/>"."Koko XL : $xs";
+                }
+            }
+            if ( array_key_exists('size_name',$cart_item ) ) {
+                if ( $cart_item['size_name']->XXL > 0 ) {
+                    $xs =  $cart_item['size_name']->XXL;
+                    $newTitle .= "<br/>"."Koko 2XL : $xs";
+                }
+            }
+            if ( array_key_exists('size_name',$cart_item ) ) {
+                if ( $cart_item['size_name']->XXXL > 0 ) {
+                    $xs =  $cart_item['size_name']->XXXL;
+                    $newTitle .= "<br/>"."Koko 3XL : $xs";
+                }
+            }
+            if ( array_key_exists('size_name',$cart_item ) ) {
+                if ( isset($cart_item['size_name']->XXXXXL) && $cart_item['size_name']->XXXXXL > 0 ) {
+                    $xs =  $cart_item['size_name']->XXXXXL;
+                    $newTitle .= "<br/>"."Koko 5XL : $xs";
+                }
+            }
+            if ( array_key_exists('size_name',$cart_item ) ) {
+                if ( isset($cart_item['size_name']->XXXXL) && $cart_item['size_name']->XXXXL > 0 ) {
+                    $xs =  $cart_item['size_name']->XXXXL;
+                    $newTitle .= "<br/>"."Koko 4XL : $xs";
+                }
             }
             if ( array_key_exists('lpc_add_total',$cart_item ) ) {
                
                 $saving = $cart_item['lpc_quantity'] * $cart_item['lpc_add_total'];
                 $saving = wc_price($saving);
-                $newTitle .= "<br/>".__("Additional Price","logo-price-calculation"). ":". $saving;
+                $newTitle .= "<br/>"."Additional Price : $saving";
+               
             }
             return $newTitle;
             
@@ -56,19 +117,27 @@ if ( ! class_exists('LPC_Frontend_Hook') ) {
             // print_r($product);
             $parent_id = $product->get_parent_id();
             $new_size = [];
-            $valuess = 0;
             if ( $parent_id > 0 ) {
                 $_product = wc_get_product( $parent_id );
-                $valuess = wc_get_product_terms( $parent_id, 'pa_koko' );
-               
+                $valuess = wc_get_product_terms( $parent_id, 'pa_new' );
+                if( isset( $valuess ) && ! empty( $valuess ) ) {
+                    $i = 0;
+                    foreach($valuess as $key=> $value ){
+                        $key = $value->slug;
+                        if ( $key == 'xxl') {
+                            $key = '2xl';
+                        }
+                        $new_size[$key]['Label'] = $value->name;
+                        $new_size[$key]['default_value'] = 0;
+                        $i++;
+                    }
+                }
                 $category_ids = $_product->get_category_ids();
             } else {
                 $category_ids = $product->get_category_ids();
             }
-            // print_r($valuess."nbaee");
              $category_acf = [];
              $condition = [];
-             $set_quantity = [];
              $i = 0;
              if( is_array($category_ids) ) {
                 foreach ( $category_ids as $key =>$id ) {
@@ -79,17 +148,14 @@ if ( ! class_exists('LPC_Frontend_Hook') ) {
                         if (!empty($logovalue1) && !empty($logovalue2) ) {
                             $category_acf[$i] = $acf_value['logo_options_settings'];
                             $condition[$i] = array_key_exists('would_you_like_to_display_quantity_fields',$acf_value)? $acf_value['would_you_like_to_display_quantity_fields']: 'no';
-                            $set_quantity[$i] = array_key_exists('minimum_order_quantity',$acf_value)? $acf_value['minimum_order_quantity']: 0;
                             $i++;
                         } else if(!empty($logovalue1)) {
                             $category_acf[$i] = $acf_value['logo_options_settings'];
                             $condition[$i] = array_key_exists('would_you_like_to_display_quantity_fields',$acf_value)? $acf_value['would_you_like_to_display_quantity_fields']: 'no';
-                            $set_quantity[$i] = array_key_exists('minimum_order_quantity',$acf_value)? $acf_value['minimum_order_quantity']: 0;
                             $i++;
                         } else if (!empty($logovalue2)) {
                             $category_acf[$i] = $acf_value['logo_options_settings'];
                             $condition[$i] = array_key_exists('would_you_like_to_display_quantity_fields',$acf_value)? $acf_value['would_you_like_to_display_quantity_fields']: 'no';
-                            $set_quantity[$i] = array_key_exists('minimum_order_quantity',$acf_value)? $acf_value['minimum_order_quantity']: 0;
                             $i++;
                         }
                     }
@@ -97,35 +163,101 @@ if ( ! class_exists('LPC_Frontend_Hook') ) {
              }
             $sale_price = $product->get_price();
             $quantity = $product->get_stock_quantity();
+            $size_select = $new_size;
                 ob_start();
-                    
+                    $price = $product->get_sale_price() ? $product->get_sale_price() : $product->get_price();
+                    $check_value = low_price_show_get_value_for_check($product->get_id(),$price);
+                    if (!$check_value) {
+                        low_price_insert_value($product->get_id(),$price);
+                    }
                     ?>
+                    <script type="text/javascript">
+					jQuery(document).ready( function($)
+					{
+						jQuery('table.variations').after('<h1>naee</h1>');
+					});
+				    </script>
                     <div class="low_price_show">
                         <?php
                             $product_avail  = $product->get_availability();
                             $availability   = $product_avail['availability'];
                             $avail_class    = $product_avail['class'];
-                            if(!in_array('yes',$condition)) { 
                         ?>
                         <p class="stock <?php echo esc_attr( $avail_class ); ?>"><?php echo wp_kses_post( $availability ); ?></p>
-                        <?php } ?>
-                        <p>
-                        <input type="hidden" name="lpc_product_price1" value="<?php echo esc_attr( $sale_price ); ?>" class="lpc_product_price1">
+                        <p><?php
+                        //    $get_currency = get_option('woocommerce_currency');
+                        $show_price = low_price_show_get_value($product->get_id());
+                        //    echo wc_price($show_price);
+                        $translate_text = __('Tuotteen alin myyntihinta viimeisen 30 vrk:n aikana:','low-price-calculation');
+                        if ($show_price == 'default'){
+                                printf('%s %s',$translate_text, wc_price($price));
+                        } else {
+                                printf('%s %s',$translate_text, wc_price($show_price) );
+                        }
+                        ?></p>
                     </div>
                     <?php if(!empty($category_acf)){ ?>
                     <div class="extra_calculation_button_wrap">
                         <p class="lpc_show_any_error" style="color:red;margin-top:10px"></p>
-                            
                         <div class="quontity_option_logo_price">
-                            <?php if(in_array('yes',$condition) &&( is_array($valuess) || is_object($valuess)) && !empty($valuess)){ ?>
-                                 <input type="hidden" name="lpc_exits_condition" value="1"/>
-                            <?php 
-                            if(empty($set_quantity)) {
-                                printf('<input type="hidden" name="lpc_quontity_set" class="lpc_quontity_set" value="1"/>');
-                            } else {
-                                printf('<input type="hidden" name="lpc_quontity_set" class="lpc_quontity_set" value="%s"/>',max($set_quantity));
-                            }
-                        }?> 
+                        <?php if(in_array('yes',$condition)) {
+                                echo '<div class="lpc_size_bulk">';
+                                 $found_product = [];
+                                 $i = 0;
+                                 if ($parent_id > 0 ) {
+                                    $_product = wc_get_product( $parent_id );
+                                    $variations = $_product->get_children();
+                                    foreach( $variations as $child ) {
+                                        $variation_product = new WC_Product_Variation( $child );
+                                        $attribuites = $variation_product->get_attributes();
+                                        if ( is_array($attribuites) && !empty($attribuites)) {
+                                            if ( array_key_exists('pa_new',$attribuites)) {
+                                                printf('<input type="hidden" name="lpc_att_select_%s" class="lpc_att_select_%s" value="%s"/>',$attribuites['pa_color'],$attribuites['pa_color'],$attribuites['pa_new']);
+                                            }
+                                        }
+                                        $color = $attribuites['pa_color'];
+                                        $found_product[$i][$color] = array_key_exists('pa_new',$attribuites) ? $attribuites['pa_new']:'';
+                                        $i++;
+                                    }
+                                 }
+                                 echo '</div>';
+                                ?>
+                            <div class="quontity_update_option">
+                                <table id="lpc_quontity_size_total">
+                                    <tbody>    
+                                        <tr>
+                                            <?php  
+                                            $i = 0;
+                                            foreach( $found_product as $key => $value ) {
+                                                foreach($value as $key => $sizes) {
+                                                    if ( !empty($sizes)) {
+                                                        if ( $i == 0 ) {
+                                                            printf('<td><input type="text" name="lpc_size_%s" class="lpc_size_%s" value="%s" id="lpc_option_hide_width_%s" /></td>',$sizes,$sizes, 50,$key);
+                                                        } else {
+                                                            printf('<td><input type="text" name="lpc_size_%s" class="lpc_size_%s" value="%s" id="lpc_option_hide_width_%s" /></td>',$sizes,$sizes,0,$key );
+                                                        }
+                                                        $i++;
+                                                    } 
+                                                }
+                                            }
+                                            ?>
+                                            </tr>
+                                            <tr>
+                                            <?php  
+                                                foreach( $found_product as $key => $value ) {
+                                                    foreach( $value as $key => $sizes) {
+                                                        if(!empty($sizes)){
+                                                            printf('<td>%s</td>',strtoupper($sizes));
+                                                        }
+                                                    }
+                                                }
+                                            ?>
+                                            </tr>
+                                        <tbody>    
+                                </table>
+                            </div>
+                            <input type="hidden" name="lpc_exits_condition" value="1"/>
+                            <?php }?>
                         <div>
                         <button type="button" class="lpc_calculate_price_button button"><?php _e("Calculate The Price",'logo-price-calculation');?></button>
                         <input type="hidden" name="lpc_product_price" value="<?php echo esc_attr( $sale_price ); ?>" class="lpc_product_price">
@@ -134,19 +266,21 @@ if ( ! class_exists('LPC_Frontend_Hook') ) {
                             <table class="lpc_variations lpc_table_on_of" cellspacing="0" role="presentation">
                                <?php
                                 $this->category_option1($category_acf);
+                                // $this->category_option2($repetar_field_value);
+                                // $this->category_option3($repetar_field_value);
                                ?>
                             </table>
                             <div class="lpc_product_price_calculating_table">
                                 <table class="lpc_border-none">
-                                    <tr class="class_th_left">
-                                        <th class="clas_c_th"><?php _e('The price of the product','logo-price-calculation');?></th>
-                                        <th class="clas_c_th"><?php _e('Number','logo-price-calculation');?></th>
-                                        <th class="clas_c_th"><?php _e('Setup Charge','logo-price-calculation');?></th>
-                                        <th class="clas_c_th"><?php _e('In total','logo-price-calculation');?></th>
-                                        <th class="clas_c_th"><?php _e('Additional Price','logo-price-calculation');?></th>
-                                        <th class="clas_c_th"><?php _e('Arvioitu toimitus','logo-price-calculation');?></th>
+                                    <tr>
+                                        <th><?php _e('The price of the product','logo-price-calculation');?></th>
+                                        <th><?php _e('Number','logo-price-calculation');?></th>
+                                        <th><?php _e('Setup Charge','logo-price-calculation');?></th>
+                                        <th><?php _e('In total','logo-price-calculation');?></th>
+                                        <th><?php _e('Additional Price','logo-price-calculation');?></th>
+                                        <th><?php _e('Delivery','logo-price-calculation');?></th>
                                     </tr>
-                                    <tr class="class_th_right">
+                                    <tr>
                                         <td class="lpc_price_of_product"><?php echo '€'.esc_attr( $sale_price );?></td>
                                         <td class="lpc_total_quantity"><?php echo esc_attr( '1' );?></td>
                                         <td class="lpc_logo_printing">1</td>
@@ -159,7 +293,7 @@ if ( ! class_exists('LPC_Frontend_Hook') ) {
                          </div>
                          <div class="percentance_table">
                                 <table id="lpc_percentance_table_total">
-                               
+                                    
                             </table>
                         </div>
                     </div>
@@ -172,143 +306,60 @@ if ( ! class_exists('LPC_Frontend_Hook') ) {
         
 
         public function woocommerce_ajax_add_to_cart() {
-            $check_size_condition = isset($_POST['lpc_size_active']) ? sanitize_text_field($_POST['lpc_size_active']) : 0;
+            $product_id        = apply_filters( 'woocommerce_add_to_cart_product_id', absint( $_POST['product_id'] ) );
+            $product           = wc_get_product( $product_id );
+            $quantity          = empty( $_POST['quantity'] ) ? 1 : wc_stock_amount( wp_unslash( $_POST['quantity'] ) );
             
-            $logo1_option = stripslashes($_POST['logo1_option_select']);
-            $logo1_color = stripslashes($_POST['logo1_option_color_select']);
-            $logo2_option = stripslashes($_POST['logo2_option_select']);
-            $logo2_color = stripslashes($_POST['logo2_option_color_select']);
-
-            if ( $check_size_condition ) {
-                $product_id = apply_filters( 'woocommerce_add_to_cart_product_id',$_POST['product_id']);
-                $strip_les_id = stripslashes($product_id);
-                $products_ids = json_decode($strip_les_id);
-
-                if( (is_array($products_ids) || is_object($products_ids))&& !empty($products_ids)  ) {
-                    // $truee = false;
-                    foreach($products_ids as $key => $product_ids){
-                        $product          = wc_get_product( $product_ids );
-                        $sizetotal        = stripslashes($_POST['sizeTotal']);
-                        $json_sizetotal   = json_decode($sizetotal);
-                        $product_status   = get_post_status( $product_ids );
-                        $strip_les        = stripslashes($_POST['variation_values']);
-                        $json_data        = json_decode($strip_les);
-                        $variations       = array();
-                        $extra_category   = $_POST['extra_category'];
-                        foreach( $json_data as $keys => $value ) {
-                            $variations[$keys] = trim($value);
-                        }
-                        $variations['attribute_pa_koko'] = $key;
-                        $product_id   = $product->get_parent_id();
-                        $quantity111 = 0;
-                        foreach($json_sizetotal as $key11 => $quantity11 ) {
-                            if( strtolower($key11) == $key ) {
-                                $quantity111 = $quantity11;
-                            }
-                        }
-                        $lpc_product_price    = $_POST['lpc_product_price'];
-                        $lpc_total_logo_price = $_POST['lpc_total_logo_price'];
-                        $lpc_show_logo_price  = $lpc_total_logo_price;
-                        $quantity             = empty( $_POST['quantity'] ) ? 1 : wc_stock_amount( wp_unslash( $_POST['quantity'] ) );
-                        if ($lpc_total_logo_price > 0 ) {
-                            $lpc_total_logo_price = $lpc_total_logo_price / $quantity;
-                        }
-                        $lpc_additionan_price = $_POST['lpc_add_total'];
-                        $array_value = array(
-                            'lpc_total_logo_price' => $lpc_total_logo_price,
-                            'lpc_product_price'    => $lpc_product_price,
-                            'lpc_show_logo_price'  => $lpc_show_logo_price,
-                            'size_name'            => $json_sizetotal,
-                            'lpc_quantity'         => $quantity111,
-                            'lpc_extra_category'   => $extra_category,
-                            'lpc_add_total'        => $lpc_additionan_price,
-                            'logo1_option'         => $logo1_option,
-                            'logo1_color'          => $logo1_color,
-                            'logo2_option'         => $logo2_option,
-                            'logo2_color'          => $logo2_color,
-
-                        );
-                        $passed_validation = apply_filters( 'woocommerce_add_to_cart_validation', true, $product_id, $quantity111, $product_ids, $variations );
-                        
-                        if ( $passed_validation && WC()->cart->add_to_cart($product_id, $quantity111, $product_ids,$variations,$array_value) && 'publish' === $product_status) {
-                            do_action('woocommerce_ajax_added_to_cart', $product_id);
-                            // $truee = true;
-                            // if ('yes' === get_option('woocommerce_cart_redirect_after_add')) {
-                            //     wc_add_to_cart_message(array($product_id => $quantity111), true);
-                            // }
-                            
-                           
-                        } else {
-                            $data = array(
-                                'error' => true,
-                                'product_url' => apply_filters('woocommerce_cart_redirect_after_error', get_permalink($product_id), $product_id));
-        
-                            echo wp_send_json($data);
-                        }
-                    }
-                    // if($truee) {
-                        WC_AJAX :: get_refreshed_fragments(); 
-                    // }
-                    
+            $sizetotal        = stripslashes($_POST['sizeTotal']);
+            $json_sizetotal   = json_decode($sizetotal);
+            $extra_category   = $_POST['extra_category'];
+           
+            $product_status    = get_post_status( $product_id );
+            $variation_id      = 0;
+            $variations        = array();
+            if ( $product && 'variation' === $product->get_type() ) {
+                $variation_id = $product_id;
+                $product_id   = $product->get_parent_id();
+                $strip_les    = stripslashes($_POST['variation_values']);
+                $json_data    = json_decode($strip_les);
+                foreach( $json_data as $key => $value ) {
+                    $variations[$key] = trim($value);
                 }
+            }
+            // print_r($variations);
+            $lpc_product_price = $_POST['lpc_product_price'];
+            $lpc_total_logo_price = $_POST['lpc_total_logo_price'];
+            $lpc_show_logo_price = $lpc_total_logo_price;
+            if ($lpc_total_logo_price > 0 ) {
+                $lpc_total_logo_price = $lpc_total_logo_price / $quantity;
+            }
+            $lpc_additionan_price = $_POST['lpc_add_total'];
+            $array_value = array(
+                'lpc_total_logo_price' => $lpc_total_logo_price,
+                'lpc_product_price'    => $lpc_product_price,
+                'lpc_show_logo_price'  => $lpc_show_logo_price,
+                'size_name'            => $json_sizetotal,
+                'lpc_quantity'         => $quantity,
+                'lpc_extra_category'   => $extra_category,
+                'lpc_add_total'        => $lpc_additionan_price,
+            );
+            $passed_validation = apply_filters( 'woocommerce_add_to_cart_validation', true, $product_id, $quantity, $variation_id, $variations );
+            if ( $passed_validation && WC()->cart->add_to_cart($product_id, $quantity, $variation_id,$variations,$array_value) && 'publish' === $product_status) {
+
+                do_action('woocommerce_ajax_added_to_cart', $product_id);
+
+                if ('yes' === get_option('woocommerce_cart_redirect_after_add')) {
+                    wc_add_to_cart_message(array($product_id => $quantity), true);
+                }
+
+                WC_AJAX :: get_refreshed_fragments();
             } else {
-                $product_id = apply_filters( 'woocommerce_add_to_cart_product_id',absint($_POST['product_id']));
-                $product           = wc_get_product( $product_id );
-                $quantity          = empty( $_POST['quantity'] ) ? 1 : wc_stock_amount( wp_unslash( $_POST['quantity'] ) );
-                
-                $sizetotal        = stripslashes($_POST['sizeTotal']);
-                $json_sizetotal   = json_decode($sizetotal);
-                $extra_category   = $_POST['extra_category'];
-                $product_status    = get_post_status( $product_id );
-                $variation_id      = 0;
-                $variations        = array();
-                if ( $product && 'variation' === $product->get_type() ) {
-                    $variation_id = $product_id;
-                    $product_id   = $product->get_parent_id();
-                    $strip_les    = stripslashes($_POST['variation_values']);
-                    $json_data    = json_decode($strip_les);
-                    foreach( $json_data as $key => $value ) {
-                        $variations[$key] = trim($value);
-                    }
-                }
-                $lpc_product_price = $_POST['lpc_product_price'];
-                $lpc_total_logo_price = $_POST['lpc_total_logo_price'];
-                $lpc_show_logo_price = $lpc_total_logo_price;
-                if ($lpc_total_logo_price > 0 ) {
-                    $lpc_total_logo_price = $lpc_total_logo_price / $quantity;
-                }
-                $lpc_additionan_price = $_POST['lpc_add_total'];
-                $array_value = array(
-                    'lpc_total_logo_price' => $lpc_total_logo_price,
-                    'lpc_product_price'    => $lpc_product_price,
-                    'lpc_show_logo_price'  => $lpc_show_logo_price,
-                    'size_name'            => $json_sizetotal,
-                    'lpc_quantity'         => $quantity,
-                    'lpc_extra_category'   => $extra_category,
-                    'lpc_add_total'        => $lpc_additionan_price,
-                    'logo1_option'         => $logo1_option,
-                    'logo1_color'          => $logo1_color,
-                    'logo2_option'         => $logo2_option,
-                    'logo2_color'          => $logo2_color,
-                );
-                $passed_validation = apply_filters( 'woocommerce_add_to_cart_validation', true, $product_id, $quantity, $variation_id, $variations );
-                
-                if ( $passed_validation && WC()->cart->add_to_cart($product_id, $quantity, $variation_id,$variations,$array_value) && 'publish' === $product_status) {
-                    do_action('woocommerce_ajax_added_to_cart', $product_id);
 
-                    if ('yes' === get_option('woocommerce_cart_redirect_after_add')) {
-                        wc_add_to_cart_message(array($product_id => $quantity), true);
-                    }
+                $data = array(
+                    'error' => true,
+                    'product_url' => apply_filters('woocommerce_cart_redirect_after_error', get_permalink($product_id), $product_id));
 
-                    WC_AJAX :: get_refreshed_fragments();
-                } else {
-
-                    $data = array(
-                        'error' => true,
-                        'product_url' => apply_filters('woocommerce_cart_redirect_after_error', get_permalink($product_id), $product_id));
-
-                    echo wp_send_json($data);
-                }
+                echo wp_send_json($data);
             }
             wp_die();
         }
@@ -340,7 +391,7 @@ if ( ! class_exists('LPC_Frontend_Hook') ) {
                     <th class="label"><label for="size"><?php _e("Logo 1:","logo-price-calculation")?></label></th>
                     <td class="value">
                         <select id="size" class="lpc_logo_main_select" name="lpc_attribute_size" >
-                            <option value="none" selected="selected" ><?php _e("En halua logoa",'logo-price-calculation');?></option>
+                            <option value="none" selected="selected" >-- I don't want a logo --</option>
                             <?php
                                 $i = 0;
                                 foreach ( $repetar_field_value['vaatteet_category_options']['logo_1']['logo_options'] as $logoName ) {
@@ -387,7 +438,7 @@ if ( ! class_exists('LPC_Frontend_Hook') ) {
                     <th class="label"><label for="color"><?php _e("Logo 2:","logo-price-calculation")?></label></th>
                     <td class="value">
                         <select id="color" class="lpc_logo_main_select2" name="lpc_attribute_size4" >
-                            <option value="none" selected="selected">En halua logoa</option>
+                            <option value="none" selected="selected">-- I don't want a logo --</option>
                             <?php
                                 $j = 0;
                                 foreach ( $repetar_field_value['vaatteet_category_options']['logo_2']['logo_options'] as $logoName ) {
